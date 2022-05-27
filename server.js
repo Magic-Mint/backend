@@ -1,6 +1,5 @@
 const express = require('express');
 const mongoose = require('mongoose');
-const { MongoDB_URI } = require('./config');
 const cors = require('cors');
 // const session = require('express-session');
 const cookieSession = require('cookie-session');
@@ -10,9 +9,10 @@ let campaign = require('./routes/campaign');
 let user = require('./routes/user');
 let claim = require('./routes/claim');
 const fileUpload = require('express-fileupload');
+require('dotenv').config();
+const { default: axios } = require('axios');
 
 let CloudAddress = require('./models/CloudAddress');
-const { default: axios } = require('axios');
 
 const FRONTEND_URL = process.env.FRONTEND_URL;
 const SUCCESS_REDIRECT = process.env.SUCCESS_REDIRECT;
@@ -30,7 +30,10 @@ async function connectDatabase() {
   console.log('Connected to mongoose successfully');
 }
 
-require('./passport-js/twitter');
+// configs
+require('./configs/cloudinary');
+require('./configs/passport-twitter');
+
 
 connectDatabase();
 
@@ -74,8 +77,10 @@ app.get('/getuser', (req, res) => {
     return res.json({
       success: true,
       message: 'user has successfully authenticated',
-      user: req.user,
-      cookies: req.cookies,
+      user: {
+        _id: req.user._id,
+        twitterProvider: req.user.twitterProvider,
+      },
     });
   }
   res.status(401).json({
@@ -109,10 +114,10 @@ app.get('/getMyTweets', async (req, res) => {
       `https://api.twitter.com/2/users/${req.user.twitterProvider.id}/tweets?exclude=retweets,replies`,
       {
         headers: {
-          Authorization: `Bearer ${process.env.BEARER_TOKEN}`,
+          Authorization: `Bearer ${process.env.TWITTER_BEARER_TOKEN}`,
         },
       }
-      );
+    );
     const tweetsIds = tweetsResponse.data.data.map((tweet) => tweet.id);
 
     const embedsPromises = tweetsIds.map(

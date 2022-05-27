@@ -18,9 +18,9 @@ passport.deserializeUser((twitterId, done) => {
 passport.use(
   new TwitterStrategy(
     {
-      consumerKey: process.env.CONSUMER_KEY,
-      consumerSecret: process.env.CONSUMER_SECRET,
-      callbackURL: process.env.CALLBACK_URL,
+      consumerKey: process.env.TWITTER_CONSUMER_KEY,
+      consumerSecret: process.env.TWITTER_CONSUMER_SECRET,
+      callbackURL: process.env.TWITTER_CALLBACK_URL,
     },
     async (token, refreshToken, profile, done) => {
       const user = await User.findOne({ 'twitterProvider.id': profile.id });

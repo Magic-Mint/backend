@@ -21,7 +21,7 @@ exports.getAllClaimsByUser = async (req, res) => {
 
   twitterPostIDs = campaigns.map((campaign) => campaign.twitterPostID);
   const config = {
-    headers: { Authorization: `Bearer ${process.env.BEARER_TOKEN}` },
+    headers: { Authorization: `Bearer ${process.env.TWITTER_BEARER_TOKEN}` },
   };
 
   twitterPostIDs.forEach(async (twitterPostID) => {
