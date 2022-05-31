@@ -5,8 +5,8 @@ const ClaimNFT = require('../models/ClaimNFT');
 const fs = require('fs');
 const path = require('path');
 const axios = require('axios').default;
-// const ipfsAPI = require('ipfs-http-client');
 const { create } = require('ipfs-http-client');
+
 const ipfs = create({
   host: 'ipfs.infura.io',
   port: '5001',
@@ -15,91 +15,63 @@ const ipfs = create({
 
 exports.getAllClaimsByUser = async (req, res) => {
   let campaigns = await Campaign.find({});
-  let claims = null;
   let newNFTs = [];
-  let ipfsData;
+  const claims = await ClaimNFT.find({}).where('owner').equals(req.user._id);
+  const claimsOriginNFTIds = claims.map((claim) => claim.originNFT.toString());
 
-  twitterPostIDs = campaigns.map((campaign) => campaign.twitterPostID);
+  const twitterPostIDs = campaigns.map((campaign) => campaign.twitterPostID);
   const config = {
     headers: { Authorization: `Bearer ${process.env.TWITTER_BEARER_TOKEN}` },
   };
-
-  twitterPostIDs.forEach(async (twitterPostID) => {
+  for (let twitterPostID of twitterPostIDs) {
     try {
-      const campaignData = await axios.get(`https://api.twitter.com/2/tweets/${twitterPostID}/retweeted_by`, config);
       //needs future optimization
+      const campaignData = await axios.get(`https://api.twitter.com/2/tweets/${twitterPostID}/retweeted_by`, config);
       // it creates requests to twitter to fetch the users that retweeted for every campaign in the database
-
-      if (campaignData.data.meta.result_count == 0) {
-        res.send('No one has reshared');
-        console.log('no one has reshared');
-        return;
-      } else {
-        let reshares = campaignData.data.data;
-
-        reshares.forEach(async (reshare, index) => {
-          if (reshare.id == req.user.twitterProvider.id) {
-            let specificCampaign = await Campaign.findOne({}).where('twitterPostID').equals(twitterPostID);
-
-            let specificNFTMetadata = await CampaignNFT.findOne({}).where('_id').equals(specificCampaign.campaignNFTID);
-
-            fs.readFile(
-              path.join(__dirname, `../public/assets/upload/NFTPrototype${specificNFTMetadata.fileSrc}`),
-              async (err, data) => {
-                if (err) {
-                  throw err;
-                } else {
-                  if (specificNFTMetadata) {
-                    let hm = true;
-
-                    claims = await ClaimNFT.find({}).where('owner').equals(req.user._id);
-
-                    claims.forEach(async (claim) => {
-                      if (claim.name == specificNFTMetadata.name && specificCampaign.campaignName == claim.campaign) {
-                        hm = false;
-                      }
-                    });
-                    if (hm) {
-                      ipfsData = await ipfs.add(data);
-
-                      const claimNFT = new ClaimNFT({
-                        isMinted: false,
-                        name: specificNFTMetadata.name,
-                        description: specificNFTMetadata.description,
-                        ipfsUri: ipfsData.path,
-                        campaign: specificCampaign._id,
-                        owner: req.user._id,
-                        campaignMintNumber: 0,
-                      });
-
-                      const saved = await claimNFT.save();
-                      newNFTs.push(saved);
-                    }
-                  }
-                }
-              }
-            );
-          }
-        });
-      }
+      if (campaignData.data.meta.result_count !== 0) {
+       let reshares = campaignData.data.data;
+       for (let reshare of reshares) {
+         if (reshare.id == req.user.twitterProvider.id) {
+           let specificCampaign = await Campaign.findOne({}).where('twitterPostID').equals(twitterPostID);
+           
+           let specificNFTMetadata = await CampaignNFT.findOne({}).where('_id').equals(specificCampaign.campaignNFTID);
+           if (specificNFTMetadata) {
+             const nftFileData = await axios.get(specificNFTMetadata.fileSrc, {
+               responseType: 'arraybuffer',
+              });
+              const isSaved = claimsOriginNFTIds.find((orgId) => orgId === specificNFTMetadata._id.toString());
+             if (!isSaved) {
+               const ipfsData = await ipfs.add(nftFileData.data);
+               const claimNFT = new ClaimNFT({
+                 isMinted: false,
+                 originNFT: specificNFTMetadata._id,
+                 campaign: specificCampaign._id,
+                 ipfsUri: ipfsData.path,
+                 owner: req.user._id,
+                 campaignMintNumber: 0,
+               });
+               const saved = await claimNFT.save();
+               newNFTs.push(saved);
+             }
+           }
+         }
+       }
+      } 
     } catch (error) {
-      console.log(error);
       res.status(500).json(error);
       return;
     }
-  });
-  console.log({ newNFTs });
-
+  }
   res.status(200).json(newNFTs);
 };
 
 exports.getClaims = async (req, res) => {
-  let claims = await ClaimNFT.find({}).where('owner').equals(req.user._id).where('isMinted').equals(false);
+  let claims = await ClaimNFT.find({}).where('owner').populate('originNFT').equals(req.user._id).where('isMinted').equals(false);
   res.status(200).json(claims);
 };
 
 exports.getClaimedNFTs = async (req, res) => {
-  let claims = await ClaimNFT.find({}).where('owner').equals(req.user._id).where('isMinted').equals(true);
+  let claims = await ClaimNFT.find({}).populate('originNFT').where('owner').equals(req.user._id).where('isMinted').equals(true);
   res.status(200).json(claims);
 };
 

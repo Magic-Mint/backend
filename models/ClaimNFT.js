@@ -6,14 +6,6 @@ const claimNFT = new Schema({
     type: Boolean,
     default: false,
   },
-  name: {
-    type: String,
-    required: true,
-  },
-  description: {
-    type: String,
-    required: true,
-  },
   ipfsUri: {
     type: String,
     required: true,
@@ -21,6 +13,11 @@ const claimNFT = new Schema({
   campaign: {
     type: Schema.Types.ObjectId,
     ref: 'campaign',
+    required: true,
+  },
+  originNFT: {
+    type: Schema.Types.ObjectId,
+    ref: 'campaignNFT',
     required: true,
   },
   owner: {

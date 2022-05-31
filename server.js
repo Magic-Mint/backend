@@ -104,6 +104,11 @@ app.get(
   })
 );
 
+app.post('/auth/logout', (req, res) => {
+  req.logout();
+  res.status(200).json('bye');
+});
+
 const oembedUrl = 'https://publish.twitter.com/oembed?omit_script=true&hide_thread=true&url=';
 const tweetsByIdUrl = 'https://twitter.com/andypiper/status/';
 

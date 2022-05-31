@@ -39,7 +39,6 @@ exports.uploadNFTFile = async (req, res) => {};
 exports.createNFT = async (req, res) => {
   const file = req.files?.file;
   if (file) {
-    const user = await User.findById(req.user._id);
     try {
       const fileBase64 = 'data:image/png;base64,' + file.data.toString('base64');
       const fileName = 'nft-upload-' + Date.now();
@@ -53,8 +52,6 @@ exports.createNFT = async (req, res) => {
         fileSrc: upload.secure_url,
       });
       const savedCampaignNFT = await campaignNFT.save();
-      user.createdNFT.push(savedCampaignNFT._id);
-      await user.save();
       res.status(200).json(savedCampaignNFT);
     } catch (error) {
       console.log({ error });
@@ -63,16 +60,10 @@ exports.createNFT = async (req, res) => {
   }
 };
 
-// exports.getNFTPrototypeCreatedByUser = async (req, res) => {
-//   const NFTPrototypes = await CampaignNFT.find({ creator: req.user._id });
-
-//   res.status(200).json(NFTPrototypes);
-// };
-
 exports.getNFTPrototypeCreatedByUser = async (req, res) => {
-  const user = await User.findById(req.user._id).populate('createdNFT');
+  const NFTPrototypes = await CampaignNFT.find({ creator: req.user._id });
 
-  res.status(200).json(user.createdNFT);
+  res.status(200).json(NFTPrototypes);
 };
 
 exports.getCampaignById = async (req, res) => {};

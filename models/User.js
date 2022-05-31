@@ -2,12 +2,6 @@ const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
 const user = new Schema({
-  createdNFT: [
-    {
-      type: Schema.Types.ObjectId,
-      ref: 'campaignNFT',
-    },
-  ],
   twitterProvider: {
     id: {
       required: true,
