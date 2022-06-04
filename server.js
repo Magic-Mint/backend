@@ -34,7 +34,6 @@ async function connectDatabase() {
 require('./configs/cloudinary');
 require('./configs/passport-twitter');
 
-
 connectDatabase();
 
 //middleware
@@ -72,21 +71,19 @@ app.use(
   })
 );
 
-app.get('/getuser', (req, res) => {
+app.get('/getMe', (req, res) => {
   if (req.user) {
-    return res.json({
-      success: true,
-      message: 'user has successfully authenticated',
-      user: {
-        _id: req.user._id,
-        twitterProvider: req.user.twitterProvider,
+    const resUser = {
+      _id: req.user._id,
+      provider: {
+        ...req.user.twitterProvider,
       },
-    });
+    };
+
+    return res.json(resUser);
   }
-  res.status(401).json({
-    authenticated: false,
-    message: 'user has not been authenticated',
-  });
+
+  res.status(401).json(null);
 });
 
 // when login failed, send failed msg
