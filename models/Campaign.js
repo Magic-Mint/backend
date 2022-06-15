@@ -1,22 +1,22 @@
-const CampaignNFT = require("./CampaignNFT");
-
-mongoose = require("mongoose");
+const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
 campaign = new Schema({
   campaignNFTID: {
     // nft id in database
-    type: String,
-    default: "",
+    type: Schema.Types.ObjectId,
+    ref: 'campaignNFT',
+
+    required: true,
   },
   campaignBase: String,
-  creatorTwitterHandle: {
-    type: String,
-    default: "",
+  creator: {
+    type: Schema.Types.ObjectId,
+    ref: 'user',
   },
   twitterPostID: {
     type: String,
-    default: "",
+    required: true,
   },
   likes: {
     // array of handles that liked
@@ -28,39 +28,32 @@ campaign = new Schema({
     type: Array,
     default: [],
   },
-  countOldLikes: {
-    type: Number,
-    default: 0,
-  },
-  countOldReshares: {
-    type: Number,
-    default: 0,
-  },
   nftCopies: {
     type: Number,
-    default: 0,
+    required: true,
   },
   collectionAddress: {
     type: String,
-    default: "",
+    default: '',
+    required: true,
   },
   includeLikesBeforeCreation: {
     type: Boolean,
-    default: false,
+    default: true,
   },
   includeResharesBeforeCreation: {
     type: Boolean,
-    default: false,
+    default: true,
   },
   campaignName: {
     type: String,
-    default: "",
+    default: '',
   },
   startDate: {
     type: Date,
-    default: Date.now,
+    default: new Date(),
   },
   endDate: Date,
 });
 
-module.exports = mongoose.model("campaign", campaign);
+module.exports = mongoose.model('campaign', campaign);

@@ -1,29 +1,22 @@
-var express = require("express");
+var express = require('express');
 let router = express.Router();
-let campaignController = require("../controllers/campaignController");
+let campaignController = require('../controllers/campaignController');
 
-router.get("/campaign/allcampaigns", campaignController.getAllCampaigns);
+router.get('/campaign/allCampaigns', campaignController.getAllCampaigns);
 
-router.get(
-  "/campaign/allcampaigns/twitterpostid",
-  campaignController.getAllCampaigns
-);
+router.get('/campaign/myCampaigns', campaignController.getAllMyCampaigns);
 
-router.get("/campaign/all/:handle", campaignController.getAllCampaignsByUser);
+router.get('/campaign/getById/:id', campaignController.getCampaignById);
 
-router.get("/campaign/:id", campaignController.getCampaignById);
 
-router.get(
-  "/campaign/getNFTPrototype/:handle",
-  campaignController.getNFTPrototypeCreatedByUser
-);
+router.get('/campaign/getNFTPrototype', campaignController.getNFTPrototypeCreatedByUser);
 
-router.post("/campaign/create", campaignController.createCampaign);
+router.post('/campaign/create', campaignController.createCampaign);
 
-router.post("/campaign/createNFT", campaignController.createNFT);
+router.post('/campaign/createNFT', campaignController.createNFT);
 
-router.post("/campaign/archive", campaignController.archieveCampaign);
+router.post('/campaign/archive', campaignController.archieveCampaign);
 
-router.post("/campaign/delete", campaignController.deleteCampaign);
+router.post('/campaign/delete', campaignController.deleteCampaign);
 
 module.exports = router;

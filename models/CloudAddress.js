@@ -1,4 +1,4 @@
-mongoose = require("mongoose");
+const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
 const cloudAddress = new Schema({
@@ -7,4 +7,4 @@ const cloudAddress = new Schema({
   privateKey: String,
 });
 
-module.exports = mongoose.model("CloudAddress", cloudAddress);
+module.exports = mongoose.model('cloudAddress', cloudAddress);

@@ -1,28 +1,26 @@
-mongoose = require("mongoose");
+const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
 const campaignNFT = new Schema({
   creator: {
-    type: {
-      id: Schema.Types.ObjectId,
-      ref: "user",
-    },
+    type: Schema.Types.ObjectId,
+    ref: 'user',
     required: true,
   },
   name: {
+    type: String,
     required: true,
     trim: true,
-    type: String,
   },
   description: {
+    type: String,
     required: true,
     trim: true,
-    type: String,
   },
-  file: {
-    required: true,
+  fileSrc: {
     type: String,
+    required: true,
   },
 });
 
-module.exports = mongoose.model("campaignNFT", campaignNFT);
+module.exports = mongoose.model('campaignNFT', campaignNFT);

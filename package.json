@@ -4,7 +4,8 @@
   "description": "Backend",
   "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon server"
   },
   "repository": {
     "type": "git",
@@ -20,6 +21,7 @@
     "@metamask/eth-sig-util": "^4.0.0",
     "axios": "^0.25.0",
     "body-parser": "^1.19.1",
+    "cloudinary": "^1.30.0",
     "cookie-parser": "^1.4.6",
     "cookie-session": "^2.0.0",
     "cors": "^2.8.5",

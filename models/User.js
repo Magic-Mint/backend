@@ -1,13 +1,7 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
 const user = new Schema({
-  createdNFT: [
-    {
-      id: Schema.Types.ObjectId,
-      ref: "campaignNFT",
-    },
-  ],
   twitterProvider: {
     id: {
       required: true,
@@ -25,8 +19,8 @@ const user = new Schema({
   },
   profileCreated: {
     type: Date,
-    default: Date.now(),
+    default: new Date(),
   },
 });
 
-module.exports = mongoose.model("user", user);
+module.exports = mongoose.model('user', user);
